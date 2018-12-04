@@ -3,18 +3,15 @@ set -eu
 
 cd $(dirname "$0")
 
-JAVA_JDK=jdk-8u172-linux-x64.tar.gz
-JAVA_URL=http://download.oracle.com/otn-pub/java/jdk/8u172-b11/a58eab1ec242421181065cdc37240b08/jdk-8u172-linux-x64.tar.gz
+JAVA_JDK=jdk-8u191-linux-x64.tar.gz
+JAVA_URL=https://download.oracle.com/otn-pub/java/jdk/8u191-b12/2787e4a523244c269598db4e85c51e0c/jdk-8u191-linux-x64.tar.gz
 
 if [ ! -f _deps/$JAVA_JDK ]; then
-    curl -k -L \
-        -H "Cookie: oraclelicense=accept-securebackup-cookie" \
-        $JAVA_URL \
-        -o _deps/$JAVA_JDK
+    wget --no-check-certificate -c --header "Cookie: oraclelicense=accept-securebackup-cookie" $JAVA_URL -O _deps/$JAVA_JDK
 fi
 
-TIZEN_CLI=web-cli_Tizen_Studio_2.4_ubuntu-64.bin
-TIZEN_URL=http://download.tizen.org/sdk/Installer/tizen-studio_2.4/web-cli_Tizen_Studio_2.4_ubuntu-64.bin
+TIZEN_CLI=web-cli_Tizen_Studio_3.0_ubuntu-64.bin
+TIZEN_URL=http://download.tizen.org/sdk/Installer/tizen-studio_3.0/web-cli_Tizen_Studio_3.0_ubuntu-64.bin
 
 if [ ! -f _deps/$TIZEN_CLI ]; then
     curl -k -L \

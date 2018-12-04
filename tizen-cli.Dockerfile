@@ -10,6 +10,7 @@ RUN apt-get update && \
         --no-install-recommends \
         acl \
         bridge-utils \
+        ca-certificates \
         cpio \
         gettext \
         libcanberra-gtk-module \
@@ -36,6 +37,40 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update
+RUN apt-get install --yes curl
+RUN touch /etc/apt/sources.list.d/nodesource.list
+RUN echo 'deb http://deb.nodesource.com/node_8.x xenial main' >> /etc/apt/sources.list.d/nodesource.list
+RUN echo 'deb-src http://deb.nodesource.com/node_8.x xenial main' >> /etc/apt/sources.list.d/nodesource.list
+RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
+RUN curl --silent --location https://deb.nodesource.com/setup_8.x | sudo bash -
+RUN apt-get update
+RUN apt-cache policy nodejs
+RUN apt-get install --yes nodejs
+RUN apt-get install --yes build-essential
+RUN update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
+RUN node --version
+
+RUN apt-get update
+RUN apt-get install --yes apt-transport-https
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+
+RUN apt-get update
+RUN apt-get install --yes yarn
+
+
+
+RUN  apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y  software-properties-common && \
+    add-apt-repository ppa:webupd8team/java -y && \
+    apt-get update && \
+    echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+    apt-get install -y oracle-java8-installer && \
+    apt-get clean
+
 RUN useradd -m -G sudo,kvm,libvirtd tizen && \
     passwd -d tizen
 
@@ -44,17 +79,12 @@ WORKDIR /home/tizen
 ENV BASH_ENV /home/tizen/.profile
 SHELL ["/bin/bash", "-c"]
 
-COPY --chown=tizen _deps/jdk-8u172-linux-x64.tar.gz .
-RUN tar zxf jdk-8u172-linux-x64.tar.gz -C ~/ && \
-    echo 'export JAVA_HOME=$HOME/jdk1.8.0_172' >> ~/.profile && \
-    echo 'export PATH=$PATH:$JAVA_HOME/bin' >> ~/.profile && \
-    rm jdk-8u172-linux-x64.tar.gz
-
-COPY --chown=tizen _deps/web-cli_Tizen_Studio_2.4_ubuntu-64.bin .
-RUN ./web-cli_Tizen_Studio_2.4_ubuntu-64.bin \
+COPY --chown=tizen _deps/web-cli_Tizen_Studio_3.0_ubuntu-64.bin .
+RUN chmod +x web-cli_Tizen_Studio_3.0_ubuntu-64.bin
+RUN ./web-cli_Tizen_Studio_3.0_ubuntu-64.bin \
     --accept-license \
     ~/tizen-studio && \
-    echo 'export PATH=$PATH:$HOME/tizen-studio/tools' >> ~/.profile && \
-    rm web-cli_Tizen_Studio_2.4_ubuntu-64.bin
+    echo 'export PATH=$PATH:$HOME/tizen-studio/tools/ide/bin' >> ~/.profile && \
+    rm web-cli_Tizen_Studio_3.0_ubuntu-64.bin
 
 CMD ["/bin/bash", "--login"]
